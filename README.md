@@ -1,6 +1,8 @@
-# 🎂 WishVault
+# 🎁 WishUnwrap
 
-**WishVault** is a premium, interactive birthday experience that transforms a standard greeting into an immersive digital journey. Instead of a static card, recipients participate in a story-driven "unlock" sequence to reveal their birthday surprises.
+**WishUnwrap** is a privacy-first, interactive birthday experience that transforms digital greetings into a journey of discovery. Built with a "zero-backend" architecture, it allows creators to bundle photos and personalized messages into a single, shareable link. 
+
+Instead of a static card, recipients participate in an immersive "Memory Unlock" sequence to reveal their birthday surprises, creating a memorable, game-like moment of delight.
 
 ![Project Preview](https://via.placeholder.com/800x450.png?text=WishVault+Preview)
 
