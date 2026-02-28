@@ -1,7 +1,9 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { WishData } from '../types';
 import { THEMES } from '../constants';
+import { MemoryUnlock } from './Experience/MemoryUnlock';
+import { CakeReveal } from './Experience/CakeReveal';
 
 interface ExperiencePreviewProps {
     wishData: WishData;
@@ -14,169 +16,211 @@ const getOrdinalSuffix = (n: number): string => {
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
+type ExperienceSection = 'entrance' | 'memory' | 'cake';
+
 export const ExperiencePreview: React.FC<ExperiencePreviewProps> = ({ wishData, onBack }) => {
     const theme = THEMES[wishData.theme];
+    const [section, setSection] = React.useState<ExperienceSection>('entrance');
+
+    const [particles] = React.useState(() =>
+        [...Array(35)].map(() => ({
+            width: Math.random() * 8 + 3,
+            height: Math.random() * 8 + 3,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            duration: Math.random() * 5 + 3,
+            delay: Math.random() * 3,
+        }))
+    );
+
+    // === MEMORY MATCH SECTION ===
+    if (section === 'memory' && wishData.photos.length > 0) {
+        return (
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key="memory"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <MemoryUnlock
+                        photos={wishData.photos}
+                        theme={theme}
+                        onComplete={() => setSection('cake')}
+                    />
+                </motion.div>
+            </AnimatePresence>
+        );
+    }
+
+    // === CAKE REVEAL SECTION ===
+    if (section === 'cake') {
+        return (
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key="cake"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <CakeReveal wishData={wishData} theme={theme} />
+                </motion.div>
+            </AnimatePresence>
+        );
+    }
+
+    // === ENTRANCE SECTION (no photos) ===
+    const handleStart = () => {
+        if (wishData.photos.length > 0) {
+            setSection('memory');
+        } else {
+            setSection('cake');
+        }
+    };
+
+    const ageText = wishData.age > 0
+        ? `Happy ${getOrdinalSuffix(wishData.age)} Birthday`
+        : 'Happy Birthday';
 
     return (
         <div
-            className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden"
-            style={{ background: `linear-gradient(135deg, ${theme.colors.bg}, ${theme.colors.secondary})` }}
+            className="min-h-screen flex flex-col items-center justify-center px-4 py-10 relative overflow-hidden"
+            style={{
+                background: `linear-gradient(135deg, ${theme.colors.bg}, ${theme.colors.primary}18, ${theme.colors.bg})`,
+            }}
         >
-            {/* Floating particles background */}
-            {[...Array(25)].map((_, i) => (
+            {/* Floating particles */}
+            {particles.map((p, i) => (
                 <motion.div
                     key={i}
-                    className="absolute rounded-full"
+                    className="absolute rounded-full pointer-events-none"
                     style={{
-                        width: Math.random() * 12 + 3,
-                        height: Math.random() * 12 + 3,
+                        width: p.width,
+                        height: p.height,
                         backgroundColor: theme.colors.accent,
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
+                        left: p.left,
+                        top: p.top,
+                        opacity: 0.15,
                     }}
                     animate={{
-                        y: [0, -40, 0],
-                        opacity: [0.05, 0.25, 0.05],
+                        y: [0, -30, 0],
+                        opacity: [0.08, 0.2, 0.08],
                     }}
                     transition={{
-                        duration: Math.random() * 4 + 3,
+                        duration: p.duration,
                         repeat: Infinity,
-                        delay: Math.random() * 3,
+                        delay: p.delay,
                     }}
                 />
             ))}
 
+            {/* Main content */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center z-10 max-w-2xl w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center z-10 w-full max-w-3xl"
             >
-                {/* Elegant sparkle divider */}
+                {/* Decorative top line */}
                 <motion.div
                     initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: '120px' }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
+                    animate={{ opacity: 1, width: '140px' }}
+                    transition={{ delay: 0.1, duration: 0.8 }}
                     className="mx-auto mb-6 h-px"
                     style={{ background: `linear-gradient(90deg, transparent, ${theme.colors.accent}, transparent)` }}
                 />
 
-                {/* Title */}
+                {/* Combined title: "Happy 1st Birthday" */}
                 <motion.p
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-lg tracking-[0.3em] uppercase text-white/70 font-light mb-3"
+                    className="text-2xl md:text-3xl font-handwriting-alt mb-3"
+                    style={{ color: theme.colors.accent }}
                 >
-                    Happy Birthday
+                    {ageText}
                 </motion.p>
 
+                {/* NAME — huge handwriting */}
                 <motion.h1
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-6xl md:text-7xl font-bold text-white mb-2 drop-shadow-lg"
-                    style={{ fontFamily: '"Outfit", sans-serif' }}
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: 0.4, type: 'spring', stiffness: 80 }}
+                    className="text-7xl md:text-8xl lg:text-9xl font-handwriting mb-6"
+                    style={{
+                        color: theme.colors.primary,
+                        textShadow: `0 4px 25px ${theme.colors.primary}40, 0 0 80px ${theme.colors.accent}15`,
+                    }}
                 >
                     {wishData.name}
                 </motion.h1>
 
-                {wishData.age > 0 && (
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="text-2xl font-light mb-2"
-                        style={{ color: theme.colors.accent }}
-                    >
-                        Turning {getOrdinalSuffix(wishData.age)} ✦
-                    </motion.p>
-                )}
-
-                {/* Elegant sparkle divider */}
-                <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: '80px' }}
-                    transition={{ delay: 0.7, duration: 0.8 }}
-                    className="mx-auto mt-4 mb-10 h-px"
-                    style={{ background: `linear-gradient(90deg, transparent, ${theme.colors.accent}, transparent)` }}
-                />
-
-                {/* Photos — large and prominent */}
-                {wishData.photos.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.8 }}
-                        className={`flex justify-center mb-10 ${wishData.photos.length === 1 ? 'gap-0' :
-                                wishData.photos.length === 2 ? 'gap-5' : 'gap-4'
-                            }`}
-                    >
-                        {wishData.photos.map((photo, i) => {
-                            const rotation = wishData.photos.length === 1 ? 0 :
-                                (i - Math.floor(wishData.photos.length / 2)) * 4;
-                            const size = wishData.photos.length === 1 ? 'w-64 h-64' :
-                                wishData.photos.length === 2 ? 'w-52 h-52' : 'w-44 h-44 md:w-52 md:h-52';
-                            return (
-                                <motion.div
-                                    key={i}
-                                    className={`${size} relative`}
-                                    initial={{ opacity: 0, y: 40, rotate: rotation }}
-                                    animate={{ opacity: 1, y: 0, rotate: rotation }}
-                                    transition={{ delay: 0.9 + i * 0.15, type: 'spring', stiffness: 100 }}
-                                    whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
-                                >
-                                    <img
-                                        src={photo}
-                                        alt={`Memory ${i + 1}`}
-                                        className="w-full h-full object-cover rounded-2xl shadow-2xl"
-                                        style={{
-                                            border: `3px solid rgba(255,255,255,0.3)`,
-                                            boxShadow: `0 20px 40px rgba(0,0,0,0.3), 0 0 20px ${theme.colors.primary}30`,
-                                        }}
-                                    />
-                                </motion.div>
-                            );
-                        })}
-                    </motion.div>
-                )}
-
-                {/* Message */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2 }}
-                    className="bg-white/10 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/20 max-w-lg mx-auto"
-                >
-                    <p className="text-white text-xl leading-relaxed font-light italic">
-                        "{wishData.message}"
-                    </p>
-                </motion.div>
-
-                {/* Placeholder notice */}
+                {/* Decorative emojis */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5 }}
-                    className="bg-black/15 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/10 max-w-md mx-auto"
+                    transition={{ delay: 0.7 }}
+                    className="flex justify-center gap-4 mb-8 text-3xl"
                 >
-                    <p className="text-white/70 text-sm">
-                        🎮 Preview mode — the full interactive experience with the Memory Unlock game,
-                        3D cake, and blow-out candles is coming in Phase 4!
-                    </p>
+                    {['🎂', '🎈', '✨', '🎁', '🎉'].map((emoji, i) => (
+                        <motion.span
+                            key={i}
+                            animate={{
+                                y: [0, -8, 0],
+                            }}
+                            transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                delay: i * 0.3,
+                            }}
+                        >
+                            {emoji}
+                        </motion.span>
+                    ))}
                 </motion.div>
+
+                {/* Decorative bottom line */}
+                <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: '100px' }}
+                    transition={{ delay: 0.6, duration: 0.8 }}
+                    className="mx-auto mb-10 h-px"
+                    style={{ background: `linear-gradient(90deg, transparent, ${theme.colors.accent}, transparent)` }}
+                />
+
+                {/* CTA Button */}
+                <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.0 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleStart}
+                    className="py-4 px-12 rounded-full font-handwriting text-2xl text-white shadow-xl transition-all"
+                    style={{
+                        background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+                        boxShadow: `0 8px 35px ${theme.colors.primary}50`,
+                    }}
+                >
+                    {wishData.photos.length > 0 ? '✨ Unwrap Memories' : '✨ See Your Surprise'}
+                </motion.button>
 
                 {/* Back button */}
                 <motion.button
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1.7 }}
+                    transition={{ delay: 1.3 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={onBack}
-                    className="py-3 px-8 bg-white/90 text-gray-800 rounded-lg font-semibold 
-                     hover:bg-white transition-colors shadow-lg"
+                    className="block mx-auto mt-5 py-2 px-6 text-sm rounded-lg font-display transition-colors"
+                    style={{
+                        color: theme.colors.text || '#666',
+                        backgroundColor: 'rgba(255,255,255,0.5)',
+                    }}
                 >
-                    ← Back to Share Screen
+                    ← Back
                 </motion.button>
             </motion.div>
         </div>

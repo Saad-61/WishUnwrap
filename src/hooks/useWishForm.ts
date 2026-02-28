@@ -4,7 +4,7 @@ import { MESSAGE_MIN_LENGTH, MESSAGE_MAX_LENGTH } from '../constants';
 
 interface useWishFormReturn {
     formData: WishData;
-    updateField: (field: keyof WishData, value: any) => void;
+    updateField: <K extends keyof WishData>(field: K, value: WishData[K]) => void;
     isValid: boolean;
     errors: Partial<Record<keyof WishData, string>>;
 }
@@ -20,7 +20,7 @@ export const useWishForm = (): useWishFormReturn => {
 
     const [errors, setErrors] = useState<Partial<Record<keyof WishData, string>>>({});
 
-    const updateField = (field: keyof WishData, value: any) => {
+    const updateField = <K extends keyof WishData>(field: K, value: WishData[K]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
         // Clear error when user starts typing
         if (errors[field]) {

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Pacifico&family=Caveat:wght@400;500;600;700&family=Permanent+Marker&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,8 +8,13 @@
   body {
     @apply m-0 min-h-screen font-body;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display;
   }
 }
@@ -20,3 +25,101 @@
   }
 }
 
+/* Custom animations */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.5);
+  }
+}
+
+@keyframes flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  25% {
+    opacity: 0.8;
+    transform: scaleY(0.95) scaleX(1.05);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1.05) scaleX(0.95);
+  }
+
+  75% {
+    opacity: 0.9;
+    transform: scaleY(0.98);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 107, 157, 0.6);
+  }
+}
+
+@keyframes typewriter-cursor {
+
+  0%,
+  100% {
+    border-right-color: transparent;
+  }
+
+  50% {
+    border-right-color: currentColor;
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes smoke-rise {
+  0% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(2);
+  }
+}

@@ -39,15 +39,16 @@ export const THEMES: Record<string, ThemeConfig> = {
         icon: '🎨',
         colors: {
             primary: '#FF6B9D',
-            secondary: '#C44569',
-            accent: '#5F27CD',
-            bg: '#FFB8B8',
+            secondary: '#E8557A',
+            accent: '#FFD93D',
+            bg: '#FFF0F3',
+            text: '#2D1B33',
         },
         description: 'Pixel art, nostalgic vibes',
     },
 };
 
-export const MAX_PHOTOS = 3;
+export const MAX_PHOTOS = 5;
 export const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
 export const TARGET_PHOTO_SIZE = 200 * 1024; // 200KB
 export const MESSAGE_MIN_LENGTH = 10;

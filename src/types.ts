@@ -17,6 +17,7 @@ export interface ThemeConfig {
         secondary: string;
         accent: string;
         bg: string;
+        text?: string;
     };
     description: string;
 }
